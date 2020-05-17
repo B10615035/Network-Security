@@ -93,7 +93,6 @@ int main(int argc, char *argv[])
     char acClientRequest[1024] = {0};
     int bytes;
     char *host, *port;
-
     
     host=argv[1];
     port=argv[2];

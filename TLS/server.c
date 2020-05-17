@@ -64,6 +64,7 @@ void ck_cert(SSL_CTX* ctx, char* CertFile, char* KeyFile){
     }
     SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
 }
+
 void clientCert(SSL* ssl)
 {
     X509 *cert;
@@ -82,6 +83,7 @@ void clientCert(SSL* ssl)
     else
         printf("Client has no certificate.\n");
 }
+
 void sreverProcess(SSL* ssl)
 {   
     char buf[1024] = {0};
@@ -126,7 +128,7 @@ void sreverProcess(SSL* ssl)
                     strcpy(name,buf);
                     char path[20]="./ServerFile/";
                     strcat(path,name);
-                    if(file=fopen(path,"r")){
+                    if(file=fopen(path, "r")){
                         char *output;
                         char result[100]={NULL};
                         int len=0;
@@ -175,9 +177,9 @@ int main(int argc, char *argv[]){
         SSL *ssl;
         int client = accept(server, (struct sockaddr*)&addr, &len);
         printf("Connection: %s:%d\n",inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
-        ssl = SSL_new(ctx);    
-        SSL_set_fd(ssl, client);      
-        sreverProcess(ssl); 
+        ssl = SSL_new(ctx);
+        SSL_set_fd(ssl, client);
+        sreverProcess(ssl);
     }
 
     close(server);

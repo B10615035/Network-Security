@@ -56,6 +56,7 @@ void CGI(int client_fd, char* router, char* method, char* post_msg)
 		waitpid(cpid, &status, 0);	
 	}
 }
+
 void pre(int client_fd)
 {
 	read(client_fd, buffer, 5000);
