@@ -16,7 +16,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <err.h>
-#define FAIL    -1
+#define FAIL -1
 #define server_crt "./server.crt"
 #define server_key "./server.key"
 #define ca_crt "./ca.crt"
@@ -221,7 +221,6 @@ int main(int argc , char *argv[])
     svr_addr.sin_addr.s_addr = INADDR_ANY;
     svr_addr.sin_port = htons(8080);
 
-
 	int sock;
 	if((sock = socket(AF_INET , SOCK_STREAM , 0)) < 0)
 		err(1, "can't open socket");
@@ -232,13 +231,11 @@ int main(int argc , char *argv[])
 		exit(-1);
 	}
 
-
 	if(bind(sock,(struct sockaddr *)&svr_addr,sizeof(svr_addr)) == -1)
 	{
 		perror("bind error");
 		exit(-1);
 	}
-
 
 	listen(sock, 5);
 
@@ -250,16 +247,6 @@ int main(int argc , char *argv[])
 		socklen_t clientLen = sizeof(cli_addr);
         SSL_CTX *ctx;
 
-        ctx = InitServerCTX();
-
-        if ( !SSL_CTX_load_verify_locations( ctx, ca_crt, NULL ) ) {
-            ERR_print_errors_fp(stderr);
-            exit(1);
-        }
-
-        ck_cert(ctx, server_crt, server_key); 
-
-        SSL *ssl;
 		int client_fd = accept(sock, (struct sockaddr*)&cli_addr, &clientLen);
 
 		if(client_fd == -1)
@@ -269,8 +256,6 @@ int main(int argc , char *argv[])
 			exit(-1);
 		}
 
-		ssl = SSL_new(ctx);
-        SSL_set_fd(ssl, client_fd);
 		int pid = fork();
 
 		if(pid < 0)
@@ -280,9 +265,22 @@ int main(int argc , char *argv[])
 		}
 		else
 		{
-			if(pid == 0)	// child process
+			if(pid == 0)
 			{
-                printf("child\n");
+                ctx = InitServerCTX();
+
+                if ( !SSL_CTX_load_verify_locations( ctx, ca_crt, NULL ) ) {
+                    ERR_print_errors_fp(stderr);
+                    exit(1);
+                }
+
+                ck_cert(ctx, server_crt, server_key); 
+
+                SSL *ssl;
+
+                ssl = SSL_new(ctx);
+                SSL_set_fd(ssl, client_fd);
+                
                  if ( SSL_accept(ssl) == FAIL ){
                     ERR_print_errors_fp(stderr);
                 } else {
@@ -296,11 +294,8 @@ int main(int argc , char *argv[])
                     pre(ssl);
                 }
 			}
-			else			// parent process
-			{
-                printf("parent\n");
+			else
 				close(client_fd);
-			}
 		}
 	}
 	close(sock);
